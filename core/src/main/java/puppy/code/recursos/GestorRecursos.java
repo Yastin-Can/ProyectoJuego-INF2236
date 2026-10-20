@@ -9,11 +9,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Gestor centralizado de recursos multimedia (Texturas, Sonidos y Música)
- * implementado mediante el patrón de diseño Singleton (GM-6) y encapsulamiento (GM-5).
+ * Gestor centralizado de recursos multimedia (Texturas, Sonidos y MÃºsica)
+ * implementado mediante el patrÃ³n de diseÃ±o Singleton (GM-6) y encapsulamiento (GM-5).
  *
  * Evita la carga duplicada de archivos en memoria en cada reinicio de partida
- * y centraliza la liberación (dispose) al cerrar la aplicación.
+ * y centraliza la liberaciÃ³n (dispose) al cerrar la aplicaciÃ³n.
  *
  * @author Benja
  */
@@ -34,7 +34,7 @@ public final class GestorRecursos {
     private final Map<String, Music> musicas;
 
     /**
-     * Constructor privado para impedir instanciación externa con 'new' (GM-6).
+     * Constructor privado para impedir instanciaciÃ³n externa con 'new' (GM-6).
      */
     private GestorRecursos() {
         this.texturas = new HashMap<String, Texture>();
@@ -43,9 +43,9 @@ public final class GestorRecursos {
     }
 
     /**
-     * Punto de acceso global a la única instancia de GestorRecursos (Lazy Initialization).
+     * Punto de acceso global a la Ãºnica instancia de GestorRecursos (Lazy Initialization).
      *
-     * @return instancia única de GestorRecursos
+     * @return instancia Ãºnica de GestorRecursos
      */
     public static GestorRecursos getInstancia() {
         if (instancia == null) {
@@ -55,9 +55,9 @@ public final class GestorRecursos {
     }
 
     /**
-     * Alias en inglés por compatibilidad con llamadas estándar getInstance().
+     * Alias en inglÃ©s por compatibilidad con llamadas estÃ¡ndar getInstance().
      *
-     * @return instancia única de GestorRecursos
+     * @return instancia Ãºnica de GestorRecursos
      */
     public static GestorRecursos getInstance() {
         return getInstancia();
@@ -77,14 +77,14 @@ public final class GestorRecursos {
     }
 
     /**
-     * Obtiene una textura desde la caché o la carga desde disco si aún no ha sido registrada.
+     * Obtiene una textura desde la cachÃ© o la carga desde disco si aÃºn no ha sido registrada.
      *
      * @param ruta nombre o ruta interna del archivo en assets/
-     * @return instancia única de Texture asociada a la ruta
+     * @return instancia Ãºnica de Texture asociada a la ruta
      */
     public Texture getTextura(String ruta) {
         if (ruta == null || ruta.trim().isEmpty()) {
-            throw new IllegalArgumentException("La ruta de la textura no puede ser nula ni vacía.");
+            throw new IllegalArgumentException("La ruta de la textura no puede ser nula ni vacÃ­a.");
         }
         if (!this.texturas.containsKey(ruta)) {
             this.texturas.put(ruta, new Texture(Gdx.files.internal(ruta)));
@@ -93,14 +93,14 @@ public final class GestorRecursos {
     }
 
     /**
-     * Obtiene un efecto de sonido desde la caché o lo carga desde disco si aún no existe.
+     * Obtiene un efecto de sonido desde la cachÃ© o lo carga desde disco si aÃºn no existe.
      *
      * @param ruta nombre o ruta interna del archivo en assets/
-     * @return instancia única de Sound asociada a la ruta
+     * @return instancia Ãºnica de Sound asociada a la ruta
      */
     public Sound getSonido(String ruta) {
         if (ruta == null || ruta.trim().isEmpty()) {
-            throw new IllegalArgumentException("La ruta del sonido no puede ser nula ni vacía.");
+            throw new IllegalArgumentException("La ruta del sonido no puede ser nula ni vacÃ­a.");
         }
         if (!this.sonidos.containsKey(ruta)) {
             this.sonidos.put(ruta, Gdx.audio.newSound(Gdx.files.internal(ruta)));
@@ -109,14 +109,14 @@ public final class GestorRecursos {
     }
 
     /**
-     * Obtiene una pista de música desde la caché o la carga desde disco si aún no existe.
+     * Obtiene una pista de mÃºsica desde la cachÃ© o la carga desde disco si aÃºn no existe.
      *
      * @param ruta nombre o ruta interna del archivo en assets/
-     * @return instancia única de Music asociada a la ruta
+     * @return instancia Ãºnica de Music asociada a la ruta
      */
     public Music getMusica(String ruta) {
         if (ruta == null || ruta.trim().isEmpty()) {
-            throw new IllegalArgumentException("La ruta de la música no puede ser nula ni vacía.");
+            throw new IllegalArgumentException("La ruta de la mÃºsica no puede ser nula ni vacÃ­a.");
         }
         if (!this.musicas.containsKey(ruta)) {
             this.musicas.put(ruta, Gdx.audio.newMusic(Gdx.files.internal(ruta)));
@@ -137,7 +137,7 @@ public final class GestorRecursos {
     }
 
     /**
-     * Obtiene la textura de la gota dorada. Si aún no existe 'dropGold.png' en assets/,
+     * Obtiene la textura de la gota dorada. Si aÃºn no existe 'dropGold.png' en assets/,
      * reutiliza 'drop.png' de forma segura para mantener el juego ejecutable.
      *
      * @return Texture para GotaDorada
@@ -163,7 +163,7 @@ public final class GestorRecursos {
     }
 
     /**
-     * Libera todos los recursos nativos (OpenGL y audio) almacenados en caché.
+     * Libera todos los recursos nativos (OpenGL y audio) almacenados en cachÃ©.
      * Debe invocarse al cerrar el juego en GameLluviaMenu.dispose().
      */
     public void liberarRecursos() {
@@ -192,7 +192,7 @@ public final class GestorRecursos {
     }
 
     /**
-     * Alias estándar de LibGDX para liberar recursos.
+     * Alias estÃ¡ndar de LibGDX para liberar recursos.
      */
     public void dispose() {
         liberarRecursos();
