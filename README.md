@@ -27,8 +27,8 @@ La referencia implementada es `MainMenuScreen`. La clase base se importa desde
    `dispose()` debe liberar únicamente recursos propios; batch y fuente pertenecen
    a `GameLluviaMenu`. `hide()` no destruye automáticamente la pantalla.
 
-PausaScreen, GameOverScreen y GameScreen todavía no están migradas. La variante
-`dibujar(SpriteBatch, float)` del borrador del informe no es este contrato.
+Las cuatro pantallas usan ahora `PantallaBase`. La fuente y el batch son
+compartidos; las pantallas no los destruyen.
 
 ### Verificación del 19 de octubre de 2026
 
@@ -40,6 +40,38 @@ PausaScreen, GameOverScreen y GameScreen todavía no están migradas. La variant
 - Capturas del framebuffer revisadas. La vuelta al menú fue provocada por la
   prueba; no es una nueva opción del juego. No se validó una partida completa,
   reinicio tras derrota ni pausa/reanudación. Pendientes para la integración final.
+
+
+### Avance verificado — 22 de octubre de 2026
+
+- GM-8: juego, pausa y fin de partida migrados a Template Method.
+- GM-7: caída recta y zigzag con delta time y fase independiente por gota.
+- GM-9: Builder y Director crean Llovizna y Tormenta. A los 100 puntos
+  se cambia a Tormenta y también se actualiza el movimiento de gotas existentes.
+- GM-4/5: Lluvia usa una colección privada de Gota y delega los efectos.
+- GM-6: texturas y audio se reutilizan desde GestorRecursos; se liberan al
+  cerrar la aplicación, incluso desde pausa. La gota dorada usa un tinte amarillo
+  cuando se reutiliza la imagen base.
+- Controles: clic para iniciar; flechas para mover; Escape para pausar/reanudar;
+  clic para reanudar; clic o Enter para reiniciar tras una derrota.
+
+Verificaciones reproducibles:
+
+```sh
+bash gradlew :core:verificarLogica
+bash gradlew :lwjgl3:verificarPantallas
+```
+
+La segunda necesita pantalla y OpenGL, abre una ventana breve y desactiva audio.
+Verifica el dibujo sin batch abierto, pausa/reanudación por entrada simulada,
+transición a Tormenta, derrota forzada, reinicio, reutilización de textura y cierre
+pausado. No reemplaza jugar una partida completa ni comprobar el sonido.
+
+**Única tarea de cierre pendiente para el 23 de octubre:** jugar una partida
+completa con audio, revisar informe/UML y presentación visual contra la pauta,
+integrar la rama mediante PR y preparar/subir la entrega. El informe y el reskin
+del equipo no se han verificado en esta sesión; el código probado sigue usando
+el aspecto del juego base. No considerar la entrega terminada solo por compilar.
 
 
 A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
