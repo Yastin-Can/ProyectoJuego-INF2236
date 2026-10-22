@@ -47,7 +47,7 @@ public class GameScreen extends PantallaBase {
     protected void actualizar(float delta) {
         if (!tarro.estaHerido()) {
             tarro.actualizarMovimiento();
-            if (!lluvia.actualizarMovimiento(tarro)) {
+            if (!lluvia.actualizarMovimiento(tarro, Math.min(delta, 0.1f))) {
                 getGame().setHigherScore(Math.max(getGame().getHigherScore(), tarro.getPuntos()));
                 getGame().setScreen(new GameOverScreen(getGame()));
                 dispose();
@@ -60,6 +60,7 @@ public class GameScreen extends PantallaBase {
         font.draw(batch, "Gotas totales: " + tarro.getPuntos(), 5, 475);
         font.draw(batch, "Vidas: " + tarro.getVidas(), 670, 475);
         font.draw(batch, "HighScore: " + getGame().getHigherScore(), 350, 475);
+        font.draw(batch, "Nivel: " + lluvia.getNombreNivel() + " | Escape: pausa", 5, 450);
         tarro.dibujar(batch);
         lluvia.actualizarDibujoLluvia(batch);
     }
