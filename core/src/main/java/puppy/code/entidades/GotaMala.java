@@ -5,7 +5,7 @@ import puppy.code.Tarro;
 import puppy.code.movimiento.MovimientoStrategy;
 
 /**
- * Gota danina que resta vidas al tarro cuando colisiona con �l (GM-4).
+ * Gota dañina que resta vidas al tarro cuando colisiona con él (GM-4).
  *
  * @author Benja
  */

@@ -8,3 +8,11 @@ dependencies {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }
 }
+
+// Se ejecuta con :core:verificarLogica; falla ante cualquier AssertionError.
+tasks.register('verificarLogica', JavaExec) {
+  dependsOn testClasses
+  classpath = sourceSets.test.runtimeClasspath
+  mainClass = 'puppy.code.VerificacionLogica'
+}
+check.dependsOn verificarLogica

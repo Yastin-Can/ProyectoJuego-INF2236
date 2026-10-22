@@ -1,5 +1,79 @@
 # GameLluviaMenu2024
 
+## Pantallas y entorno de desarrollo
+
+Para ejecutar el wrapper actual, configurar `JAVA_HOME` con JDK 17 o superior:
+`construo` 1.4.1 requiere esa JVM. El destino del código se mantiene en Java 11.
+Guardar los fuentes en UTF-8.
+
+- Compilar: `bash gradlew :core:compileJava :lwjgl3:compileJava`.
+- Ejecutar: `bash gradlew lwjgl3:run` (requiere entorno gráfico y audio).
+
+### Contrato para adaptar las pantallas
+
+La referencia implementada es `MainMenuScreen`. La clase base se importa desde
+`puppy.code.pantallas.PantallaBase`.
+
+1. Extender `PantallaBase` y llamar `super(game)` en el constructor.
+2. Implementar `dibujar(SpriteBatch batch, BitmapFont font)` para el contenido.
+   No llamar `begin()` ni `end()` y no cambiar de pantalla dentro de este método.
+3. Usar `procesarEntrada()` para navegar mediante `getGame().setScreen(...)`.
+   Se ejecuta cuando el batch ya está cerrado.
+4. Si hay lógica por frame, sobrescribir `actualizar(float delta)`. Se ejecuta antes
+   del dibujo; si cambia la pantalla, la base cancela el dibujo de la anterior.
+5. Para otro fondo, sobrescribir `limpiarPantalla()`. La cámara está disponible
+   mediante `getCamera()` y mantiene coordenadas lógicas de 800 por 480.
+6. No sobrescribir `render()`: es final. No crear otro batch ni otra fuente.
+   `dispose()` debe liberar únicamente recursos propios; batch y fuente pertenecen
+   a `GameLluviaMenu`. `hide()` no destruye automáticamente la pantalla.
+
+Las cuatro pantallas usan ahora `PantallaBase`. La fuente y el batch son
+compartidos; las pantallas no los destruyen.
+
+### Verificación del 19 de octubre de 2026
+
+- Compilación de core y lwjgl3 correcta con Gradle y JDK 17.
+- Prueba temporal con el backend LWJGL3: dibujado del menú, entrada simulada a
+  través de `procesarEntrada()`, transición a GameScreen y dibujado de la partida.
+- Verificado que el batch compartido queda cerrado tras la transición y que el
+  menú vuelve a dibujarse usando los recursos compartidos tras cerrar la partida.
+- Capturas del framebuffer revisadas. La vuelta al menú fue provocada por la
+  prueba; no es una nueva opción del juego. No se validó una partida completa,
+  reinicio tras derrota ni pausa/reanudación. Pendientes para la integración final.
+
+
+### Avance verificado — 22 de octubre de 2026
+
+- GM-8: juego, pausa y fin de partida migrados a Template Method.
+- GM-7: caída recta y zigzag con delta time y fase independiente por gota.
+- GM-9: Builder y Director crean Llovizna y Tormenta. A los 100 puntos
+  se cambia a Tormenta y también se actualiza el movimiento de gotas existentes.
+- GM-4/5: Lluvia usa una colección privada de Gota y delega los efectos.
+- GM-6: texturas y audio se reutilizan desde GestorRecursos; se liberan al
+  cerrar la aplicación, incluso desde pausa. La gota dorada usa un tinte amarillo
+  cuando se reutiliza la imagen base.
+- Controles: clic para iniciar; flechas para mover; Escape para pausar/reanudar;
+  clic para reanudar; clic o Enter para reiniciar tras una derrota.
+
+Verificaciones reproducibles:
+
+```sh
+bash gradlew :core:verificarLogica
+bash gradlew :lwjgl3:verificarPantallas
+```
+
+La segunda necesita pantalla y OpenGL, abre una ventana breve y desactiva audio.
+Verifica el dibujo sin batch abierto, pausa/reanudación por entrada simulada,
+transición a Tormenta, derrota forzada, reinicio, reutilización de textura y cierre
+pausado. No reemplaza jugar una partida completa ni comprobar el sonido.
+
+**Única tarea de cierre pendiente para el 23 de octubre:** jugar una partida
+completa con audio, revisar informe/UML y presentación visual contra la pauta,
+integrar la rama mediante PR y preparar/subir la entrega. El informe y el reskin
+del equipo no se han verificado en esta sesión; el código probado sigue usando
+el aspecto del juego base. No considerar la entrega terminada solo por compilar.
+
+
 A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
 
 This project was generated with a template including simple application launchers and an `ApplicationAdapter` extension that draws libGDX logo.

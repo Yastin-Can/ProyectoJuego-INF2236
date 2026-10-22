@@ -127,9 +127,7 @@ public class Tarro implements Dibujable {
     }
 
     public void destruir() {
-        if (this.bucketImage != null) {
-            this.bucketImage.dispose();
-        }
+        // El gestor comparte y libera la textura al cerrar la aplicacion.
     }
 
     public int getVidas() {
@@ -141,7 +139,7 @@ public class Tarro implements Dibujable {
     }
 
     /**
-     * Retorna una copia defensiva del �rea de colisi�n para preservar el encapsulamiento (GM-5).
+     * Retorna una copia defensiva del área de colisión para preservar el encapsulamiento (GM-5).
      *
      * @return copia del Rectangle del tarro
      */

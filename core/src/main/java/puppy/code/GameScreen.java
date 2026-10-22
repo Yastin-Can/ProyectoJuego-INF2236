@@ -1,119 +1,73 @@
 package puppy.code;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.ScreenUtils;
+import puppy.code.pantallas.PantallaBase;
+import puppy.code.recursos.GestorRecursos;
 
-public class GameScreen implements Screen {
-	final GameLluviaMenu game;
-    private OrthographicCamera camera;
-	private SpriteBatch batch;	   
-	private BitmapFont font;
-	private Tarro tarro;
-	private Lluvia lluvia;
+public class GameScreen extends PantallaBase {
+    private final Tarro tarro;
+    private final Lluvia lluvia;
+    private boolean destruida;
 
-	   
-	//boolean activo = true;
+    public GameScreen(GameLluviaMenu game) {
+        super(game);
+        GestorRecursos recursos = GestorRecursos.getInstancia();
+        tarro = new Tarro(recursos.getTexturaTarro(), recursos.getSonidoHerido());
+        lluvia = new Lluvia(recursos.getTexturaGotaBuena(), recursos.getTexturaGotaMala(),
+                recursos.getTexturaGotaDorada(), recursos.getSonidoGota(), recursos.getMusicaLluvia());
+        lluvia.crear();
+    }
 
-	public GameScreen(final GameLluviaMenu game) {
-		this.game = game;
-        this.batch = game.getBatch();
-        this.font = game.getFont();
-		  // load the images for the droplet and the bucket, 64x64 pixels each 	     
-		  Sound hurtSound = Gdx.audio.newSound(Gdx.files.internal("hurt.ogg"));
-		  tarro = new Tarro(new Texture(Gdx.files.internal("bucket.png")),hurtSound);
-         
-	      // load the drop sound effect and the rain background "music" 
-         Texture gota = new Texture(Gdx.files.internal("drop.png"));
-         Texture gotaMala = new Texture(Gdx.files.internal("dropBad.png"));
-         
-         Sound dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
-        
-	     Music rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
-         lluvia = new Lluvia(gota, gotaMala, dropSound, rainMusic);
-	      
-	      // camera
-	      camera = new OrthographicCamera();
-	      camera.setToOrtho(false, 800, 480);
-	      batch = new SpriteBatch();
-	      // creacion del tarro
-	      tarro.crear();
-	      
-	      // creacion de la lluvia
-	      lluvia.crear();
-	}
+    @Override
+    protected void actualizar(float delta) {
+        if (!tarro.estaHerido()) {
+            tarro.actualizarMovimiento();
+            if (!lluvia.actualizarMovimiento(tarro, Math.min(delta, 0.1f))) {
+                getGame().setHigherScore(Math.max(getGame().getHigherScore(), tarro.getPuntos()));
+                getGame().setScreen(new GameOverScreen(getGame()));
+                dispose();
+            }
+        }
+    }
 
-	@Override
-	public void render(float delta) {
-		//limpia la pantalla con color azul obscuro.
-		ScreenUtils.clear(0, 0, 0.2f, 1);
-		//actualizar matrices de la cámara
-		camera.update();
-		//actualizar 
-		batch.setProjectionMatrix(camera.combined);
-		batch.begin();
-		//dibujar textos
-		font.draw(batch, "Gotas totales: " + tarro.getPuntos(), 5, 475);
-		font.draw(batch, "Vidas : " + tarro.getVidas(), 670, 475);
-		font.draw(batch, "HighScore : " + game.getHigherScore(), camera.viewportWidth/2-50, 475);
-		
-		if (!tarro.estaHerido()) {
-			// movimiento del tarro desde teclado
-	        tarro.actualizarMovimiento();        
-			// caida de la lluvia 
-	       if (!lluvia.actualizarMovimiento(tarro)) {
-	    	  //actualizar HigherScore
-	    	  if (game.getHigherScore()<tarro.getPuntos())
-	    		  game.setHigherScore(tarro.getPuntos());  
-	    	  //ir a la ventana de finde juego y destruir la actual
-	    	  game.setScreen(new GameOverScreen(game));
-	    	  dispose();
-	       }
-		}
-		
-		tarro.dibujar(batch);
-		lluvia.actualizarDibujoLluvia(batch);
-		
-		batch.end();
-	}
+    @Override
+    protected void dibujar(SpriteBatch batch, BitmapFont font) {
+        font.draw(batch, "Gotas totales: " + tarro.getPuntos(), 5, 475);
+        font.draw(batch, "Vidas: " + tarro.getVidas(), 670, 475);
+        font.draw(batch, "HighScore: " + getGame().getHigherScore(), 350, 475);
+        font.draw(batch, "Nivel: " + lluvia.getNombreNivel() + " | Escape: pausa", 5, 450);
+        tarro.dibujar(batch);
+        lluvia.actualizarDibujoLluvia(batch);
+    }
 
-	@Override
-	public void resize(int width, int height) {
-	}
+    @Override
+    protected void procesarEntrada() {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            pause();
+        }
+    }
 
-	@Override
-	public void show() {
-	  // continuar con sonido de lluvia
-	  lluvia.continuar();
-	}
+    @Override
+    public void show() { lluvia.continuar(); }
 
-	@Override
-	public void hide() {
+    @Override
+    public void hide() { lluvia.pausar(); }
 
-	}
+    @Override
+    public void pause() {
+        if (!destruida && getGame().getScreen() == this) {
+            getGame().setScreen(new PausaScreen(getGame(), this));
+        }
+    }
 
-	@Override
-	public void pause() {
-		lluvia.pausar();
-		game.setScreen(new PausaScreen(game, this)); 
-	}
-
-	@Override
-	public void resume() {
-
-	}
-
-	@Override
-	public void dispose() {
-      tarro.destruir();
-      lluvia.destruir();
-
-	}
-
+    @Override
+    public void dispose() {
+        if (!destruida) {
+            lluvia.destruir();
+            destruida = true;
+        }
+    }
 }

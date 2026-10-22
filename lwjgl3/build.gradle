@@ -130,3 +130,11 @@ startScripts.classpath = project.tasks.jar.outputs.files
 if(enableGraalNative == 'true') {
   apply from: file("nativeimage.gradle")
 }
+
+// Requiere pantalla/OpenGL. Audio desactivado en esta prueba automatica.
+tasks.register('verificarPantallas', JavaExec) {
+  dependsOn testClasses
+  classpath = sourceSets.test.runtimeClasspath
+  mainClass = 'puppy.code.VerificacionPantallas'
+  workingDir = rootProject.file('assets').path
+}

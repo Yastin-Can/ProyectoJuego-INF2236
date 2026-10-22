@@ -1,83 +1,41 @@
 package puppy.code;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
+import puppy.code.pantallas.PantallaBase;
 
+public class PausaScreen extends PantallaBase {
+    private final GameScreen juego;
 
-public class PausaScreen implements Screen {
-
-	private final GameLluviaMenu game;
-	private GameScreen juego;
-	private SpriteBatch batch;	   
-	private BitmapFont font;
-	private OrthographicCamera camera;
-
-	public PausaScreen (final GameLluviaMenu game, GameScreen juego) {
-		this.game = game;
+    public PausaScreen(GameLluviaMenu game, GameScreen juego) {
+        super(game);
         this.juego = juego;
-        this.batch = game.getBatch();
-        this.font = game.getFont();
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 800, 480);
-	}
+    }
 
-	@Override
-	public void render(float delta) {
-		ScreenUtils.clear(0, 0, 1.0f, 0.5f);
+    @Override
+    protected void limpiarPantalla() {
+        ScreenUtils.clear(0, 0, 1, 1);
+    }
 
-		camera.update();
-		batch.setProjectionMatrix(camera.combined);
+    @Override
+    protected void dibujar(SpriteBatch batch, BitmapFont font) {
+        font.draw(batch, "Juego en pausa", 100, 150);
+        font.draw(batch, "Clic o Escape para continuar", 100, 100);
+    }
 
-		batch.begin();
-		font.draw(batch, "Juego en Pausa ", 100, 150);
-		font.draw(batch, "Toca en cualquier lado para continuar !!!", 100, 100);
-		batch.end();
+    @Override
+    protected void procesarEntrada() {
+        if (Gdx.input.justTouched() || Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            getGame().setScreen(juego);
+        }
+    }
 
-		if (Gdx.input.isTouched()) {
-			game.setScreen(juego);
-			dispose();
-		}
-	}
-
-	@Override
-	public void show() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void pause() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void resume() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void hide() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
-		
-	}
-
+    @Override
+    public void dispose() {
+        // Al cerrar la aplicacion pausada, libera tambien la partida retenida.
+        juego.dispose();
+    }
 }
-

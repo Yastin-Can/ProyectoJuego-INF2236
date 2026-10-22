@@ -39,6 +39,17 @@ public class GotaDorada extends Gota {
     }
 
     @Override
+    public void dibujar(com.badlogic.gdx.graphics.g2d.SpriteBatch batch) {
+        float colorAnterior = batch.getPackedColor();
+        try {
+            batch.setColor(1f, 0.8f, 0.1f, 1f);
+            super.dibujar(batch);
+        } finally {
+            batch.setPackedColor(colorAnterior);
+        }
+    }
+
+    @Override
     public void aplicarEfecto(Tarro tarro) {
         if (tarro != null) {
             tarro.sumarVida(this.vidasExtra);
