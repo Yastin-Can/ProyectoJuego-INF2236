@@ -5,7 +5,7 @@ import puppy.code.Tarro;
 import puppy.code.movimiento.MovimientoStrategy;
 
 /**
- * Gota dañina que resta vidas al tarro cuando colisiona con él (GM-4).
+ * Gota danina que resta vidas al tarro cuando colisiona con ï¿½l (GM-4).
  *
  * @author Benja
  */
@@ -28,9 +28,9 @@ public class GotaMala extends Gota {
     public void aplicarEfecto(Tarro tarro) {
         if (tarro != null) {
             if (this.dano == DANO_POR_DEFECTO) {
-                tarro.dañar();
+                tarro.danar();
             } else {
-                tarro.dañar(this.dano);
+                tarro.danar(this.dano);
             }
         }
     }
