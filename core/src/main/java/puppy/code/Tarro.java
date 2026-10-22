@@ -79,11 +79,11 @@ public class Tarro implements Dibujable {
         }
     }
 
-    public void dañar() {
-        dañar(1);
+    public void danar() {
+        danar(1);
     }
 
-    public void dañar(int dano) {
+    public void danar(int dano) {
         if (dano > 0) {
             this.vidas = Math.max(0, this.vidas - dano);
             this.herido = true;
@@ -141,7 +141,7 @@ public class Tarro implements Dibujable {
     }
 
     /**
-     * Retorna una copia defensiva del área de colisión para preservar el encapsulamiento (GM-5).
+     * Retorna una copia defensiva del ï¿½rea de colisiï¿½n para preservar el encapsulamiento (GM-5).
      *
      * @return copia del Rectangle del tarro
      */

@@ -66,7 +66,7 @@ public class Lluvia {
 	      }
 	      if(raindrop.overlaps(tarro.getArea())) { //la gota choca con el tarro
 	    	if(rainDropsType.get(i)==1) { // gota dañina
-	    	  tarro.dañar();
+	    	  tarro.danar();
 	    	  if (tarro.getVidas()<=0)
 	    		 return false; // si se queda sin vidas retorna falso /game over
 	    	  rainDropsPos.removeIndex(i);
