@@ -28,9 +28,9 @@ public class GotaMala extends Gota {
     public void aplicarEfecto(Tarro tarro) {
         if (tarro != null) {
             if (this.dano == DANO_POR_DEFECTO) {
-                tarro.dañar();
+                tarro.danar();
             } else {
-                tarro.dañar(this.dano);
+                tarro.danar(this.dano);
             }
         }
     }

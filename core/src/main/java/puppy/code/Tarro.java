@@ -79,11 +79,11 @@ public class Tarro implements Dibujable {
         }
     }
 
-    public void dañar() {
-        dañar(1);
+    public void danar() {
+        danar(1);
     }
 
-    public void dañar(int dano) {
+    public void danar(int dano) {
         if (dano > 0) {
             this.vidas = Math.max(0, this.vidas - dano);
             this.herido = true;
