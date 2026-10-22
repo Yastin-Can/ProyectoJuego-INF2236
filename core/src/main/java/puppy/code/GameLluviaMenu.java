@@ -21,7 +21,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 		}
 
 		public void dispose() {
-			batch.dispose();
+			if (getScreen() != null) {
+                getScreen().dispose();
+            }
+            puppy.code.recursos.GestorRecursos.getInstancia().liberarRecursos();
+            batch.dispose();
 			font.dispose();
 		}
 

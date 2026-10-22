@@ -1,47 +1,25 @@
 package puppy.code;
 
 import com.badlogic.gdx.Gdx;
-import puppy.code.pantallas.PantallaBase;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.ScreenUtils;
+import puppy.code.pantallas.PantallaBase;
+import puppy.code.recursos.GestorRecursos;
 
 public class GameScreen extends PantallaBase {
+    private final Tarro tarro;
+    private final Lluvia lluvia;
+    private boolean destruida;
 
-
-
-
-	private Tarro tarro;
-	private Lluvia lluvia;
-
-	   
-	//boolean activo = true;
-
-	public GameScreen(final GameLluviaMenu game) {
+    public GameScreen(GameLluviaMenu game) {
         super(game);
-		  // load the images for the droplet and the bucket, 64x64 pixels each 	     
-		  Sound hurtSound = Gdx.audio.newSound(Gdx.files.internal("hurt.ogg"));
-		  tarro = new Tarro(new Texture(Gdx.files.internal("bucket.png")),hurtSound);
-         
-	      // load the drop sound effect and the rain background "music" 
-         Texture gota = new Texture(Gdx.files.internal("drop.png"));
-         Texture gotaMala = new Texture(Gdx.files.internal("dropBad.png"));
-         
-         Sound dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
-        
-	     Music rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
-         lluvia = new Lluvia(gota, gotaMala, dropSound, rainMusic);
-	      
-	      // creacion del tarro
-	      tarro.crear();
-	      
-	      // creacion de la lluvia
-	      lluvia.crear();
-	}
+        GestorRecursos recursos = GestorRecursos.getInstancia();
+        tarro = new Tarro(recursos.getTexturaTarro(), recursos.getSonidoHerido());
+        lluvia = new Lluvia(recursos.getTexturaGotaBuena(), recursos.getTexturaGotaMala(),
+                recursos.getTexturaGotaDorada(), recursos.getSonidoGota(), recursos.getMusicaLluvia());
+        lluvia.crear();
+    }
 
     @Override
     protected void actualizar(float delta) {
@@ -67,42 +45,29 @@ public class GameScreen extends PantallaBase {
 
     @Override
     protected void procesarEntrada() {
-        if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.ESCAPE)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             pause();
         }
     }
 
-	@Override
-	public void resize(int width, int height) {
-	}
+    @Override
+    public void show() { lluvia.continuar(); }
 
-	@Override
-	public void show() {
-	  // continuar con sonido de lluvia
-	  lluvia.continuar();
-	}
+    @Override
+    public void hide() { lluvia.pausar(); }
 
-	@Override
-	public void hide() {
+    @Override
+    public void pause() {
+        if (!destruida && getGame().getScreen() == this) {
+            getGame().setScreen(new PausaScreen(getGame(), this));
+        }
+    }
 
-	}
-
-	@Override
-	public void pause() {
-		lluvia.pausar();
-		getGame().setScreen(new PausaScreen(getGame(), this)); 
-	}
-
-	@Override
-	public void resume() {
-
-	}
-
-	@Override
-	public void dispose() {
-      tarro.destruir();
-      lluvia.destruir();
-
-	}
-
+    @Override
+    public void dispose() {
+        if (!destruida) {
+            lluvia.destruir();
+            destruida = true;
+        }
+    }
 }

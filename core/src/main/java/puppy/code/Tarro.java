@@ -127,9 +127,7 @@ public class Tarro implements Dibujable {
     }
 
     public void destruir() {
-        if (this.bucketImage != null) {
-            this.bucketImage.dispose();
-        }
+        // El gestor comparte y libera la textura al cerrar la aplicacion.
     }
 
     public int getVidas() {

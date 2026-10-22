@@ -101,8 +101,8 @@ public class Lluvia {
 
     public void destruir() {
         gotas.clear();
-        sonido.dispose();
-        musica.dispose();
+        // Texturas y audio pertenecen al Singleton; solo detener la partida.
+        musica.stop();
     }
 
     public void pausar() { musica.pause(); }
