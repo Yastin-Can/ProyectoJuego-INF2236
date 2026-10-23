@@ -23,7 +23,7 @@ public class NivelTormentaBuilder implements NivelBuilder {
     @Override
     public void definirProbabilidades() {
         mala = 0.35f;
-        dorada = 0.06f;
+        dorada = 0.01f;
     }
 
     @Override
