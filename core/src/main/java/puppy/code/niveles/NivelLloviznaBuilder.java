@@ -23,7 +23,7 @@ public class NivelLloviznaBuilder implements NivelBuilder {
     @Override
     public void definirProbabilidades() {
         mala = 0.2f;
-        dorada = 0.08f;
+        dorada = 0.03f;
     }
 
     @Override
