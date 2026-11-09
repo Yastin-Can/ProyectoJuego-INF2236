@@ -14,6 +14,10 @@ buildscript {
   }
 }
 
+if (JavaVersion.current() != JavaVersion.VERSION_11) {
+  throw new GradleException('Este proyecto se compila con JDK 11. Configura JAVA_HOME y la JVM de Gradle en el IDE.')
+}
+
 allprojects {
   apply plugin: 'eclipse'
   apply plugin: 'idea'

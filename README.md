@@ -20,10 +20,9 @@ ambos deben mostrar Java 11. En Windows, usar `gradlew.bat` en lugar de
 `bash gradlew` en los comandos siguientes.
 
 Todos los módulos se compilan con `--release 11` y codificación UTF-8.
-El proceso normal de compilación, pruebas y generación del JAR funciona con
-JDK 11. Los instaladores opcionales con runtime incluido usan Construo y
-requieren JDK 17; solo se activan expresamente con `-PpackageNative`.
-No son necesarios para ejecutar ni entregar el JAR del juego.
+La compilación exige que Gradle se ejecute con JDK 11 y muestra un error si se
+selecciona otra versión. La entrega contiene el proyecto fuente y el JAR con
+sus dependencias y recursos; no incluye un runtime de Java.
 
 ## Compilar y ejecutar
 
