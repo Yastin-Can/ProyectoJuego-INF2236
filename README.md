@@ -1,107 +1,92 @@
-# GameLluviaMenu2024
+# Recolecta Gotas — Grupo 27
 
-## Pantallas y entorno de desarrollo
+Proyecto de Programación Avanzada INF2236 desarrollado con Java y LibGDX.
+El jugador mueve un tarro para recoger gotas buenas y evitar las dañinas.
+Las gotas buenas suman 10 puntos, las malas restan una vida y las doradas
+recuperan una vida. La partida comienza con tres vidas. Al alcanzar 100 puntos,
+el nivel cambia de Llovizna a Tormenta, con mayor frecuencia de gotas y caída
+en zigzag.
 
-Para ejecutar el wrapper actual, configurar `JAVA_HOME` con JDK 17 o superior:
-`construo` 1.4.1 requiere esa JVM. El destino del código se mantiene en Java 11.
-Guardar los fuentes en UTF-8.
+## Requisitos
 
-- Compilar: `bash gradlew :core:compileJava :lwjgl3:compileJava`.
-- Ejecutar: `bash gradlew lwjgl3:run` (requiere entorno gráfico y audio).
+- JDK 11. Las bases especifican Oracle JDK 11; la validación local del
+  9 de noviembre de 2026 se realizó con OpenJDK 11.0.32.1 en Linux.
+- Entorno gráfico compatible con OpenGL y dispositivo de audio.
+- Internet en la primera compilación para descargar Gradle y las dependencias.
 
-### Contrato para adaptar las pantallas
+Configurar `JAVA_HOME` con la carpeta del JDK 11 y seleccionar esa misma JVM
+para Gradle en el IDE. Comprobar `java -version` y `bash gradlew --version`:
+ambos deben mostrar Java 11. En Windows, usar `gradlew.bat` en lugar de
+`bash gradlew` en los comandos siguientes.
 
-La referencia implementada es `MainMenuScreen`. La clase base se importa desde
-`puppy.code.pantallas.PantallaBase`.
+Todos los módulos se compilan con `--release 11` y codificación UTF-8.
+El proceso normal de compilación, pruebas y generación del JAR funciona con
+JDK 11. Los instaladores opcionales con runtime incluido usan Construo y
+requieren JDK 17; solo se activan expresamente con `-PpackageNative`.
+No son necesarios para ejecutar ni entregar el JAR del juego.
 
-1. Extender `PantallaBase` y llamar `super(game)` en el constructor.
-2. Implementar `dibujar(SpriteBatch batch, BitmapFont font)` para el contenido.
-   No llamar `begin()` ni `end()` y no cambiar de pantalla dentro de este método.
-3. Usar `procesarEntrada()` para navegar mediante `getGame().setScreen(...)`.
-   Se ejecuta cuando el batch ya está cerrado.
-4. Si hay lógica por frame, sobrescribir `actualizar(float delta)`. Se ejecuta antes
-   del dibujo; si cambia la pantalla, la base cancela el dibujo de la anterior.
-5. Para otro fondo, sobrescribir `limpiarPantalla()`. La cámara está disponible
-   mediante `getCamera()` y mantiene coordenadas lógicas de 800 por 480.
-6. No sobrescribir `render()`: es final. No crear otro batch ni otra fuente.
-   `dispose()` debe liberar únicamente recursos propios; batch y fuente pertenecen
-   a `GameLluviaMenu`. `hide()` no destruye automáticamente la pantalla.
+## Compilar y ejecutar
 
-Las cuatro pantallas usan ahora `PantallaBase`. La fuente y el batch son
-compartidos; las pantallas no los destruyen.
+Desde la raíz del proyecto:
 
-### Verificación del 19 de octubre de 2026
+```sh
+bash gradlew clean :core:verificarLogica :lwjgl3:jar
+bash gradlew :lwjgl3:run
+```
 
-- Compilación de core y lwjgl3 correcta con Gradle y JDK 17.
-- Prueba temporal con el backend LWJGL3: dibujado del menú, entrada simulada a
-  través de `procesarEntrada()`, transición a GameScreen y dibujado de la partida.
-- Verificado que el batch compartido queda cerrado tras la transición y que el
-  menú vuelve a dibujarse usando los recursos compartidos tras cerrar la partida.
-- Capturas del framebuffer revisadas. La vuelta al menú fue provocada por la
-  prueba; no es una nueva opción del juego. No se validó una partida completa,
-  reinicio tras derrota ni pausa/reanudación. Pendientes para la integración final.
+El JAR incluye las dependencias, las imágenes y el audio. Puede copiarse a otra
+carpeta y ejecutarse con Java 11, sin copiar la carpeta `assets`:
 
+```sh
+java -jar lwjgl3/build/libs/GameLluviaMenu2024-1.0.0.jar
+```
 
-### Avance verificado — 22 de octubre de 2026
+Si se mueve el JAR, ajustar su ruta en el comando. En macOS, iniciar con
+`java -XstartOnFirstThread -jar ruta/al/archivo.jar`.
 
-- GM-8: juego, pausa y fin de partida migrados a Template Method.
-- GM-7: caída recta y zigzag con delta time y fase independiente por gota.
-- GM-9: Builder y Director crean Llovizna y Tormenta. A los 100 puntos
-  se cambia a Tormenta y también se actualiza el movimiento de gotas existentes.
-- GM-4/5: Lluvia usa una colección privada de Gota y delega los efectos.
-- GM-6: texturas y audio se reutilizan desde GestorRecursos; se liberan al
-  cerrar la aplicación, incluso desde pausa. La gota dorada usa un tinte amarillo
-  cuando se reutiliza la imagen base.
-- Controles: clic para iniciar; flechas para mover; Escape para pausar/reanudar;
-  clic para reanudar; clic o Enter para reiniciar tras una derrota.
+## Controles
 
-Verificaciones reproducibles:
+| Acción | Control |
+|---|---|
+| Comenzar | Clic en el menú |
+| Mover el tarro | Flechas izquierda y derecha |
+| Pausar | Escape |
+| Reanudar | Escape o clic |
+| Reiniciar tras perder | Enter o clic |
+
+## Verificación
 
 ```sh
 bash gradlew :core:verificarLogica
 bash gradlew :lwjgl3:verificarPantallas
 ```
 
-La segunda necesita pantalla y OpenGL, abre una ventana breve y desactiva audio.
-Verifica el dibujo sin batch abierto, pausa/reanudación por entrada simulada,
-transición a Tormenta, derrota forzada, reinicio, reutilización de textura y cierre
-pausado. No reemplaza jugar una partida completa ni comprobar el sonido.
+La primera comprueba estrategias de caída independientes de la tasa de cuadros,
+construcción de niveles, efectos de las gotas y encapsulamiento del área del
+tarro. La segunda necesita pantalla/OpenGL: abre una ventana breve, desactiva
+el audio y comprueba menú, partida, pausa, reanudación, cambio de nivel,
+derrota, reinicio, reutilización de texturas y cierre desde pausa.
 
-**Única tarea de cierre pendiente para el 23 de octubre:** jugar una partida
-completa con audio, revisar informe/UML y presentación visual contra la pauta,
-integrar la rama mediante PR y preparar/subir la entrega. El informe y el reskin
-del equipo no se han verificado en esta sesión; el código probado sigue usando
-el aspecto del juego base. No considerar la entrega terminada solo por compilar.
+El 9 de noviembre de 2026 se completaron ambas verificaciones y la generación
+del JAR desde una compilación limpia con OpenJDK 11. Se comprobó además el JAR
+fuera del proyecto, sin una carpeta `assets` externa, con carga y reproducción
+de música y efectos habilitadas. Estas comprobaciones no sustituyen la prueba
+manual de una partida completa ni la comprobación en el equipo de entrega.
 
+## Organización del código
 
-A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
+- `core`: lógica, entidades, pantallas, recursos, movimientos y niveles.
+- `lwjgl3`: aplicación de escritorio, recursos de arranque y empaquetado.
+- `assets`: imágenes y audio del juego.
 
-This project was generated with a template including simple application launchers and an `ApplicationAdapter` extension that draws libGDX logo.
+`Gota` define los efectos polimórficos de los tres tipos de gotas y `Dibujable`
+es el contrato de dibujo. `GestorRecursos` centraliza la carga y liberación de
+recursos mediante Singleton. Los movimientos usan Strategy; los niveles se
+construyen mediante Builder y `DirectorNivel`; las pantallas comparten el ciclo
+de Template Method en `PantallaBase`.
 
-## Platforms
-
-- `core`: Main module with the application logic shared by all platforms.
-- `lwjgl3`: Primary desktop platform using LWJGL3; was called 'desktop' in older docs.
-
-## Gradle
-
-This project uses [Gradle](https://gradle.org/) to manage dependencies.
-The Gradle wrapper was included, so you can run Gradle tasks using `gradlew.bat` or `./gradlew` commands.
-Useful Gradle tasks and flags:
-
-- `--continue`: when using this flag, errors will not stop the tasks from running.
-- `--daemon`: thanks to this flag, Gradle daemon will be used to run chosen tasks.
-- `--offline`: when using this flag, cached dependency archives will be used.
-- `--refresh-dependencies`: this flag forces validation of all dependencies. Useful for snapshot versions.
-- `build`: builds sources and archives of every project.
-- `cleanEclipse`: removes Eclipse project data.
-- `cleanIdea`: removes IntelliJ project data.
-- `clean`: removes `build` folders, which store compiled classes and built archives.
-- `eclipse`: generates Eclipse project data.
-- `idea`: generates IntelliJ project data.
-- `lwjgl3:jar`: builds application's runnable jar, which can be found at `lwjgl3/build/libs`.
-- `lwjgl3:run`: starts the application.
-- `test`: runs unit tests (if any).
-
-Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
-For example, `core:clean` removes `build` folder only from the `core` project.
+Las pantallas implementan `dibujar(SpriteBatch, BitmapFont)` sin abrir/cerrar el
+batch y usan `procesarEntrada()` para navegar. La lógica se actualiza en
+`actualizar(float delta)`. El batch y la fuente pertenecen a `GameLluviaMenu`;
+las pantallas solo liberan sus recursos propios. Las coordenadas lógicas son
+800 × 480.
