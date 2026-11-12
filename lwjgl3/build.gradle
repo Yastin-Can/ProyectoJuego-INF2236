@@ -1,21 +1,6 @@
-
-buildscript {
-  repositories {
-    gradlePluginPortal()
-  }
-  dependencies {
-    if(enableGraalNative == 'true') {
-      classpath "org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:0.9.28"
-    }
-  }
-}
 plugins {
-  id "io.github.fourlastor.construo" version "1.4.1"
   id "application"
 }
-
-
-import io.github.fourlastor.construo.Target
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 mainClassName = 'puppy.code.lwjgl3.Lwjgl3Launcher'
@@ -32,17 +17,13 @@ dependencies {
   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
   implementation project(':core')
 
-  if(enableGraalNative == 'true') {
-    implementation "io.github.berstanio:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion"
-    }
-
 }
 
 def os = System.properties['os.name'].toLowerCase()
 
 run {
   workingDir = rootProject.file('assets').path
-  setIgnoreExitValue(true)
+  setIgnoreExitValue(false)
 
   if (os.contains('mac')) jvmArgs += "-XstartOnFirstThread"
 }
@@ -56,6 +37,8 @@ jar {
   from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
 // these "exclude" lines remove some unnecessary duplicate files in the output JAR.
   exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
+  // El JAR para Java 11 utiliza las clases base de las dependencias.
+  exclude('META-INF/versions/**')
   dependencies {
     exclude('META-INF/INDEX.LIST', 'META-INF/maven/**')
   }
@@ -67,42 +50,6 @@ jar {
   doLast {
     file(archiveFile).setExecutable(true, false)
   }
-}
-
-construo {
-    // name of the executable
-    name.set(appName)
-    // human-readable name, used for example in the `.app` name for macOS
-    humanName.set(appName)
-    // Optional, defaults to project version property
-    version.set("$projectVersion")
-
-    targets.configure {
-      create("linuxX64", Target.Linux) {
-        architecture.set(Target.Architecture.X86_64)
-        jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.12%2B7/OpenJDK17U-jdk_x64_linux_hotspot_17.0.12_7.tar.gz")
-      }
-      create("macM1", Target.MacOs) {
-        architecture.set(Target.Architecture.AARCH64)
-        jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.12%2B7/OpenJDK17U-jdk_aarch64_mac_hotspot_17.0.12_7.tar.gz")
-        // macOS needs an identifier
-        identifier.set("puppy.code." + appName)
-        // Optional: icon for macOS
-        macIcon.set(project.file("icons/logo.icns"))
-      }
-      create("macX64", Target.MacOs) {
-        architecture.set(Target.Architecture.X86_64)
-        jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.12%2B7/OpenJDK17U-jdk_x64_mac_hotspot_17.0.12_7.tar.gz")
-        // macOS needs an identifier
-        identifier.set("puppy.code." + appName)
-        // Optional: icon for macOS
-        macIcon.set(project.file("icons/logo.icns"))
-      }
-      create("winX64", Target.Windows) {
-        architecture.set(Target.Architecture.X86_64)
-        jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.12%2B7/OpenJDK17U-jdk_x64_windows_hotspot_17.0.12_7.zip")
-      }
-    }
 }
 
 // Equivalent to the jar task; here for compatibility with gdx-setup.
@@ -127,14 +74,11 @@ distributions {
 startScripts.dependsOn(':lwjgl3:jar')
 startScripts.classpath = project.tasks.jar.outputs.files
 
-if(enableGraalNative == 'true') {
-  apply from: file("nativeimage.gradle")
-}
-
 // Requiere pantalla/OpenGL. Audio desactivado en esta prueba automatica.
 tasks.register('verificarPantallas', JavaExec) {
   dependsOn testClasses
   classpath = sourceSets.test.runtimeClasspath
   mainClass = 'puppy.code.VerificacionPantallas'
   workingDir = rootProject.file('assets').path
+  if (os.contains('mac')) jvmArgs += "-XstartOnFirstThread"
 }
